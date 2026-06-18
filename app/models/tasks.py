@@ -3,7 +3,7 @@
 
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database import Base  # наш общий Base
+from app.database import Base  # наш общий Base
 
 class Task(Base):
     __tablename__ = "tasks"

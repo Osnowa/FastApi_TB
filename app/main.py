@@ -1,22 +1,22 @@
 from fastapi import FastAPI
 import uvicorn
-from routers.tasks import router as task_router
+from .routers.tasks import router as task_router
 
 from contextlib import asynccontextmanager
-from database import create_table, disponse_engine, SessionDep
+from app.database import disponse_engine, SessionDep
 
-from models.tasks import Task 
+from app.models.tasks import Task 
 
+# Метод, который работает про включении и выкл приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    '''Создание таблиц и закрытие соединения с базой данных'''
-    await create_table()
+    print("app start")
     yield
-    # При остановке закрываем соединение с базой данных
+    print("app stop")
     await disponse_engine()
 
-# создаем приложение
 app = FastAPI(lifespan=lifespan)
+
 # подключаем роутеры
 app.include_router(task_router)
 

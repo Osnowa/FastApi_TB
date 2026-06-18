@@ -219,3 +219,7 @@ __marimo__/
 
 # База данных
 tasks.db
+
+one_cod.py
+
+FastApi_tasks_*
