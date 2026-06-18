@@ -54,9 +54,7 @@ async def delete_task(id: int, session: SessionDep):
     repo = Repository(session)
     result = await repo.get_task_by_id(id)
     if result:
-        await session.delete(result)
-        await session.commit()
-        return
+        repo.delete_task(id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

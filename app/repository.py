@@ -1,5 +1,5 @@
 # Файл для работы с базой данных
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.tasks import Task_add
@@ -46,4 +46,5 @@ class Repository:
         if not task:
             return None
         else:
-            return True
+            await self.session.delete(task)
+            await self.session.commit()

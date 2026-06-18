@@ -3,7 +3,7 @@ import uvicorn
 from .routers.tasks import router as task_router
 
 from contextlib import asynccontextmanager
-from app.database import disponse_engine, SessionDep
+from app.database import disponse_engine
 
 from app.models.tasks import Task 
 
