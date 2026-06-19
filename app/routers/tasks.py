@@ -23,7 +23,7 @@ async def get_tasks(session: SessionDep):
     return await repo.get_all_tasks()
 
 @router.get('/{id}', response_model=Task_puch, status_code=status.HTTP_200_OK)
-async def get_task(id: int , session: SessionDep):
+async def get_task_id(id: int , session: SessionDep):
     '''Получить задачу по id'''
     repo = Repository(session)
     result =  await repo.get_task_by_id(id)
@@ -54,7 +54,7 @@ async def delete_task(id: int, session: SessionDep):
     repo = Repository(session)
     result = await repo.get_task_by_id(id)
     if result:
-        repo.delete_task(id)
+        await repo.delete_task(id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

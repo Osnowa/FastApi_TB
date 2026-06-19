@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
-from .routers.tasks import router as task_router
+from app.routers.tasks import router as task_router
 
 from contextlib import asynccontextmanager
 from app.database import disponse_engine
 
-from app.models.tasks import Task 
 
 # Метод, который работает про включении и выкл приложения
 @asynccontextmanager
