@@ -28,4 +28,4 @@ jobs:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           ALEMBIC_DATABASE_URL: "sqlite+aiosqlite:///./test.db"
       run: |
-        pytest
+        pytest --cov=app
