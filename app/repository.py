@@ -2,7 +2,7 @@
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.tasks import Task_add
+from app.schemas.tasks import TaskCreate, TaskPatch
 from app.models.tasks import Task
 
 
@@ -11,7 +11,7 @@ class Repository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add_task(self, data: Task_add):
+    async def add_task(self, data: TaskCreate):
         '''Добавление задачи в базу данных'''
         task = Task(**data.model_dump()) # ORM умеет работать только с своими моделями
         self.session.add(task) # добавление задачи в базу данных
@@ -30,12 +30,22 @@ class Repository:
         result = await self.session.execute(select(Task).where(Task.id == task_id))
         return result.scalars().one_or_none()
     
-    async def update_task(self, task_id: int, data: Task_add):
+    async def update_task(self, task_id: int, data: TaskCreate):
         '''Обновление задачи в базе данных'''
         task = await self.get_task_by_id(task_id)
         if not task:
             return None
         stmt = update(Task).where(Task.id == task_id).values(**data.model_dump())
+        await self.session.execute(stmt)
+        await self.session.commit()
+        return await self.get_task_by_id(task_id)
+    
+    async def patch_task(self, task_id: int, data: TaskPatch):
+        '''Частичное обновление задачи в базе данных'''
+        task = await self.get_task_by_id(task_id)
+        if not task:
+            return None
+        stmt = update(Task).where(Task.id == task_id).values(**data.model_dump(exclude_unset=True))
         await self.session.execute(stmt)
         await self.session.commit()
         return await self.get_task_by_id(task_id)
@@ -48,3 +58,4 @@ class Repository:
         else:
             await self.session.delete(task)
             await self.session.commit()
+
