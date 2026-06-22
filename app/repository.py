@@ -2,8 +2,9 @@
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.tasks import TaskCreate, TaskPatch
+from app.schemas.tasks import TaskCreate, TaskPatch, TaskUpdate
 from app.models.tasks import Task
+from app.models.enum import Status, Priority, SortOrderId
 
 
 class Repository:
@@ -20,9 +21,30 @@ class Repository:
         # возвращаем задачу для post, по схеме pydantic
         return task 
     
-    async def get_all_tasks(self):
+    async def get_all_tasks(
+            self, 
+            status: Status | None = None, 
+            priority: Priority | None = None, 
+            order_by: SortOrderId | None = None
+            ):
         '''Получение всех задач из базы данных'''
-        result = await self.session.execute(select(Task))
+
+        stmt = select(Task)
+
+        if status is not None:
+            stmt = stmt.where(Task.status == status)
+
+        if priority is not None:
+            stmt = stmt.where(Task.priority == priority)
+
+        if order_by is not None:
+            if order_by == SortOrderId.asc:
+                stmt = stmt.order_by(Task.id.asc())
+            elif order_by == SortOrderId.desc:
+                stmt = stmt.order_by(Task.id.desc())
+
+    
+        result = await self.session.execute(stmt)
         return result.scalars().all()
     
     async def get_task_by_id(self, task_id: int):
@@ -30,7 +52,7 @@ class Repository:
         result = await self.session.execute(select(Task).where(Task.id == task_id))
         return result.scalars().one_or_none()
     
-    async def update_task(self, task_id: int, data: TaskCreate):
+    async def update_task(self, task_id: int, data: TaskUpdate):
         '''Обновление задачи в базе данных'''
         task = await self.get_task_by_id(task_id)
         if not task:

@@ -1,5 +1,5 @@
 from app.repository import Repository
-from app.schemas.tasks import Task_add
+from app.schemas.tasks import TaskCreate
 
 
 async def test_add_task(client):
@@ -54,7 +54,7 @@ async def test_get_task_id(client, db):
 
     repo = Repository(db)
     # добавим задачу
-    await repo.add_task(Task_add(title="test_title_id", description="test_description"))
+    await repo.add_task(TaskCreate(title="test_title_id", description="test_description"))
     # получим задачу по id
     response = await client.get("/tasks/1")
     assert response.status_code == 200
@@ -83,10 +83,10 @@ async def test_put_task(client, db):
             "description": "test_description_changed"
         }
     )
-    task = await client.get("/tasks/1")
-    assert task.status_code == 200
-    assert task.json()["title"] == "test_title_changed"
-    assert task.json()["description"] == "test_description_changed"
+    task1 = await client.get("/tasks/1")
+    assert task1.status_code == 200
+    assert task1.json()["title"] == "test_title_changed"
+    assert task1.json()["description"] == "test_description_changed"
 
 
 async def test_delete_task(client):

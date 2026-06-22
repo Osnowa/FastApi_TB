@@ -17,8 +17,8 @@ class TaskCreate(TaskBase):
 
 class TaskUpdate(TaskBase):
     '''Отправка задачи пользователю (полное изменение)'''
-    status: Status | None
-    priority: Priority | None 
+    status: Status | None = None
+    priority: Priority | None = None 
 
 class TaskPatch(BaseModel):
     '''Изменение задачи (частичное изменение)'''
@@ -30,5 +30,5 @@ class TaskPatch(BaseModel):
 class TaskResponse(TaskBase):
     '''Ответ пользователю'''
     id: int
-    status: Status 
+    status: Status | None
     priority: Priority | None

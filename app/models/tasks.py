@@ -1,5 +1,4 @@
 # Модель данных для базы данных в SQLite и SQLAlchemy
-from enum import Enum
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 

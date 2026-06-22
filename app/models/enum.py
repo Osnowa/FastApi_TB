@@ -9,3 +9,7 @@ class Priority(str, Enum):
     low = "low"
     medium = "medium"
     high = "high"
+
+class SortOrderId(str, Enum):
+    ID_ASC = "id_asc"
+    ID_DESC = "id_desc"

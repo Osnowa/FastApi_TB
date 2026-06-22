@@ -1,0 +1,10 @@
+# Папки, которые не нужно проверять
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "migrations"
+]
+
+[tool.ruff.lint]
+per-file-ignores = { "tests/test_get_filter.py" = ["F401", "F811"] }

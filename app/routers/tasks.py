@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, HTTPException
 
 from app.schemas.tasks import TaskCreate, TaskUpdate, TaskPatch, TaskResponse
 from ..database import SessionDep
+from app.models.enum import Status, Priority, SortOrderId
 
 from app.repository import Repository
 
@@ -10,19 +11,19 @@ router = APIRouter(
     tags=["tasks"]
 )
 
-@router.post("/", response_model = TaskResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def add_task(task: TaskCreate, session: SessionDep) -> TaskResponse:
     '''Добавить задачу'''
     repo = Repository(session)
     return await repo.add_task(task)
 
-@router.get("/", response_model=list[TaskResponse], status_code=status.HTTP_200_OK)
-async def get_tasks(session: SessionDep) -> list[TaskResponse]:
-    '''Получить все задачи'''
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_tasks(session: SessionDep, status: Status | None = None, priority: Priority | None = None, order_by: SortOrderId | None = None) -> list[TaskResponse]:
+    '''Получить все задачи (имеется фильтрация по статусу и приоритету) & сортировка по id'''
     repo = Repository(session)
-    return await repo.get_all_tasks()
+    return await repo.get_all_tasks(status, priority, order_by)
 
-@router.get('/{id}', response_model=TaskResponse, status_code=status.HTTP_200_OK)
+@router.get('/{id}', status_code=status.HTTP_200_OK)
 async def get_task_id(id: int , session: SessionDep) -> TaskResponse:
     '''Получить задачу по id'''
     repo = Repository(session)
@@ -35,7 +36,7 @@ async def get_task_id(id: int , session: SessionDep) -> TaskResponse:
             detail="Задача не найдена"
             )
     
-@router.put('/{id}', response_model=TaskResponse, status_code=status.HTTP_200_OK)
+@router.put('/{id}', status_code=status.HTTP_200_OK)
 async def put_task(id: int, task: TaskUpdate, session: SessionDep) -> TaskResponse:
     '''Изменить задачу (полная замена)'''
     repo = Repository(session)
@@ -48,7 +49,7 @@ async def put_task(id: int, task: TaskUpdate, session: SessionDep) -> TaskRespon
             detail="Задача не найдена"
             )
     
-@router.patch('/{id}', response_model=TaskResponse, status_code=status.HTTP_200_OK)
+@router.patch('/{id}', status_code=status.HTTP_200_OK)
 async def patch_task(id: int, data: TaskPatch, session: SessionDep) -> TaskResponse:
     '''Изменить задачу (частичное изменение)'''
     repo = Repository(session)
