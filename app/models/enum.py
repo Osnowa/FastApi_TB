@@ -1,15 +1,15 @@
-from enum import Enum
+from enum import Enum, StrEnum
 
-class Status(str, Enum):
+class Status(StrEnum):
     new = "new"
     in_progress = "in_progress"
     done = "done"
 
-class Priority(str, Enum):
+class Priority(StrEnum):
     low = "low"
     medium = "medium"
     high = "high"
 
-class SortOrderId(str, Enum):
-    ID_ASC = "id_asc"
-    ID_DESC = "id_desc"
+class SortOrderId(StrEnum):
+    id_asc = "id_asc"
+    id_desc = "id_desc"

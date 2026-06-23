@@ -3,7 +3,7 @@ import uvicorn
 from app.routers.tasks import router as task_router
 
 from contextlib import asynccontextmanager
-from app.database import disponse_engine
+from app.database import dispose_engine
 
 
 # Метод, который работает про включении и выкл приложения
@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     print("app start")
     yield
     print("app stop")
-    await disponse_engine()
+    await dispose_engine()
 
 app = FastAPI(lifespan=lifespan)
 

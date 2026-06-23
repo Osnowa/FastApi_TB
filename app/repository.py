@@ -38,9 +38,9 @@ class Repository:
             stmt = stmt.where(Task.priority == priority)
 
         if order_by is not None:
-            if order_by == SortOrderId.asc:
+            if order_by == SortOrderId.id_asc:
                 stmt = stmt.order_by(Task.id.asc())
-            elif order_by == SortOrderId.desc:
+            elif order_by == SortOrderId.id_desc:
                 stmt = stmt.order_by(Task.id.desc())
 
     

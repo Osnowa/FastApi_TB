@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes  # AOF (Append Only File) — записывать каждую операцию на диск
+                                            # без этого при перезапуске Redis потеряет данные
+    volumes:
+      - redis_data:/data
+
+    ports:
+      - "6379:6379"
+
+    networks:
+      - backend_net
+
+volumes:
+  redis_data:
+
+
+networks:
+  backend_net:    # nginx ↔ backend ↔ redis
+

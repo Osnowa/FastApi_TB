@@ -19,7 +19,7 @@ SessionFactory = async_sessionmaker(engine, expire_on_commit=False)
 class Base(DeclarativeBase):
     pass
 
-async def disponse_engine():
+async def dispose_engine():
     '''Закрытие соединения с базой данных'''
     await engine.dispose()
 
