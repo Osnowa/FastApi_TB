@@ -1,5 +1,6 @@
+from helpers_db import create_tasks
 
-async def test_patch_task_priority(client, db):
+async def test_patch_task_priority(client):
     '''Проверка обновления задачи (что меняется только priority)'''
     await client.post(
         "/tasks/",
@@ -26,7 +27,7 @@ async def test_patch_task_priority(client, db):
     assert result.json()["description"] == "test_description"
     assert result.json()["title"] == "test_title"
 
-async def test_patch_not_found_task(client, db):
+async def test_patch_not_found_task(client):
     '''Проверка обновления несуществующей задачи'''
     await client.patch(
         "/tasks/1",
@@ -41,7 +42,7 @@ async def test_patch_not_found_task(client, db):
 
     assert result.status_code == 404
 
-async def test_patch_task_status(client, db, mocker):
+async def test_patch_task_status(client):
     '''Проверка обновления задачи (что меняется только status)'''
     # 1. Создаем реальную задачу через API
     response = await client.post(
@@ -76,3 +77,22 @@ async def test_patch_task_status(client, db, mocker):
     response = await client.get(f"/tasks/{task_id}")
     assert response.json()["status"] == "in_progress"
     
+async def test_patch_garbage_status(client, create_tasks):
+    '''Проверка обновелния, с мусорным значением статуса'''
+    response = await client.patch(
+        "/tasks/1",
+        json={
+            "status": "invalid"
+        }
+    )
+    assert response.status_code == 422
+
+async def test_patch_garbage_priority(client, create_tasks):
+    '''Проверка обновелния, с мусорным значением приоритета'''
+    response = await client.patch(
+        "/tasks/1",
+        json={
+            "priority": "invalid"
+        }
+    )
+    assert response.status_code == 422

@@ -6,6 +6,7 @@ from app.models.enum import Status, Priority, SortOrderId
 config = BotConfig.from_env()
  
 class TaskAPIClient:
+    '''Клиент для работы с API'''
     def __init__(self):
         self._client = httpx.AsyncClient(
             base_url=config.API_URL,
@@ -13,6 +14,7 @@ class TaskAPIClient:
         )
 
     async def get_tasks(self, status: Status = None, priority: Priority = None, order_by: SortOrderId = None):
+        '''Получить все задачи'''
         params = {}
         if status is not None:
             params["status"] = status
@@ -30,6 +32,7 @@ class TaskAPIClient:
         return response.json()  
         
     async def create_task(self, title: str, description: str, priority: Priority = None):
+        '''Создать задачу'''
         params = {
             "title": title,
             "description": description
@@ -45,6 +48,7 @@ class TaskAPIClient:
         return response.json()
         
     async def update_task(self, task_id: int, data: dict):
+        '''Обновить задачу (полностью)'''
         response = await self._client.put(
             f"/tasks/{task_id}",
             json=data
@@ -53,6 +57,7 @@ class TaskAPIClient:
         return response.json()
         
     async def patch_task(self, task_id: int, data: dict):
+        '''Обновить задачу (частично)'''
         response = await self._client.patch(
             f"/tasks/{task_id}",
             json=data
@@ -61,6 +66,7 @@ class TaskAPIClient:
         return response.json()
         
     async def delete_task(self, task_id: int):
+        '''Удалить задачу'''
         response = await self._client.delete(
             f"/tasks/{task_id}"
         )

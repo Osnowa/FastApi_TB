@@ -1,5 +1,6 @@
 # схемы данных для FastAPI на получение и отправку
 from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 
 from app.models.enum import Status, Priority
 
@@ -16,7 +17,7 @@ class TaskCreate(TaskBase):
     priority: Priority | None = None
 
 class TaskUpdate(TaskBase):
-    '''Отправка задачи пользователю (полное изменение)'''
+    '''Изменение задачи (полное изменение)'''
     status: Status | None = None
     priority: Priority | None = None 
 
@@ -32,3 +33,4 @@ class TaskResponse(TaskBase):
     id: int
     status: Status | None
     priority: Priority | None
+    created_at: datetime

@@ -18,10 +18,20 @@ async def add_task(task: TaskCreate, session: SessionDep) -> TaskResponse:
     return await repo.add_task(task)
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def get_tasks(session: SessionDep, status: Status | None = None, priority: Priority | None = None, order_by: SortOrderId | None = None) -> list[TaskResponse]:
-    '''Получить все задачи (имеется фильтрация по статусу и приоритету) & сортировка по id'''
+async def get_tasks(
+    session: SessionDep, 
+    status: Status | None = None, 
+    priority: Priority | None = None, 
+    order_by: SortOrderId | None = None,
+    title: str | None = None,
+    limit: int | None = 10,
+    offset: int | None = 0
+    ) -> list[TaskResponse]:
+    '''Получить все задачи (имеется фильтрация по статусу и приоритету, \
+    поиск по названию) & сортировка по id, пагинация'''
+    
     repo = Repository(session)
-    return await repo.get_all_tasks(status, priority, order_by)
+    return await repo.get_all_tasks(status, priority, order_by, title, limit, offset)
 
 @router.get('/{id}', status_code=status.HTTP_200_OK)
 async def get_task_id(id: int , session: SessionDep) -> TaskResponse:

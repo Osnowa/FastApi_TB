@@ -6,10 +6,13 @@ from bot.config import BotConfig
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-from bot.handlers.starts import router as router_start
-from bot.handlers.tasks import router as router_tasks
+from bot.handlers.add_tasks import router as router_add_tasks
+from bot.handlers.delete_tasks import router as router_delete_tasks
+from bot.handlers.done_task import router as router_done_tasks
+from bot.handlers.show_tasks import router as router_show_tasks
+from bot.handlers.common import router as router_common
 
-from bot.services.api_client import TaskAPIClient
+
 
 from aiogram.fsm.storage.redis import RedisStorage
 from bot.states.redis import r
@@ -37,17 +40,20 @@ async def main():
     dp = Dispatcher(storage=storage)
 
     logger.info("Подключение роутеров")
-    dp.include_router(router_start)
-    dp.include_router(router_tasks)
+    dp.include_router(router_common)
+    dp.include_router(router_add_tasks)
+    dp.include_router(router_delete_tasks)
+    dp.include_router(router_done_tasks)
+    dp.include_router(router_show_tasks)
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
     finally:
-        await dp.storage.close()
-        await bot.session.close()
-        await r.close()
-        await api_client.close()
+        await dp.storage.close() # закрываем 
+        await bot.session.close() # закрываем сессию
+        await r.close() # закрываем соединение с Redis
+        await api_client.close() # закрываем соединение с API
 
 if __name__ == "__main__":
     asyncio.run(main())

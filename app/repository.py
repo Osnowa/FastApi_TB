@@ -25,11 +25,18 @@ class Repository:
             self, 
             status: Status | None = None, 
             priority: Priority | None = None, 
-            order_by: SortOrderId | None = None
+            order_by: SortOrderId | None = None,
+            title: str | None = None,
+            limit: int | None = 10,
+            offset: int | None = 0
             ):
         '''Получение всех задач из базы данных'''
 
+
         stmt = select(Task)
+
+        if title is not None:
+            stmt = stmt.where(Task.title.contains(title))
 
         if status is not None:
             stmt = stmt.where(Task.status == status)
@@ -43,7 +50,8 @@ class Repository:
             elif order_by == SortOrderId.id_desc:
                 stmt = stmt.order_by(Task.id.desc())
 
-    
+        stmt = stmt.limit(limit).offset(offset)
+
         result = await self.session.execute(stmt)
         return result.scalars().all()
     
@@ -53,7 +61,7 @@ class Repository:
         return result.scalars().one_or_none()
     
     async def update_task(self, task_id: int, data: TaskUpdate):
-        '''Обновление задачи в базе данных'''
+        '''Обновление задачи в базе данных (полная замена)'''
         task = await self.get_task_by_id(task_id)
         if not task:
             return None

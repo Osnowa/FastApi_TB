@@ -1,6 +1,8 @@
 # Модель данных для базы данных в SQLite и SQLAlchemy
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
+from datetime import datetime
+from sqlalchemy.sql import func
 
 from app.database import Base  # наш общий Base
 
@@ -14,3 +16,4 @@ class Task(Base):
     description: Mapped[str] # описание задачи
     status: Mapped[Status | None] = mapped_column(SQLEnum(Status), default=Status.new) # статус задачи
     priority: Mapped[Priority | None] = mapped_column(SQLEnum(Priority), default=None) # приоритет
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now()) # дата создания
