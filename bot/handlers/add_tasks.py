@@ -7,6 +7,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from bot.services.api_client import api_client  # 👈 Импортируем глобальный
 
+import logging
+import httpx
+
+logger = logging.getLogger(__name__)
+
 router = Router()
 
 @router.message(Command('add'), StateFilter(default_state))
@@ -38,9 +43,14 @@ async def add_task_finish(message: Message, state: FSMContext):
     if request_user in ['low', 'medium', 'high', None]:
         await state.update_data(priority = request_user)
         data = await state.get_data()
-        response = await api_client.create_task(data['title'], data['description'], data['priority'])
+        try:
+            response = await api_client.create_task(data['title'], data['description'], data['priority'])
+        except httpx.HTTPError as e:
+            await message.answer(f"Произошла ошибка: {e}")
+            logger.error(f"Произошла ошибка: {e}")
+            return
     else:
-        await message.answer("Неверный приоритет задачи")
+        await message.answer("Неверный приоритет задачи\n Введите low, medium, high или нет")
         return
     await message.answer(f"Задача {response['title']} добавлена")
     await state.clear()
