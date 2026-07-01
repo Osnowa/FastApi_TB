@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.database import SessionDep
-from app.schemas import SUserRegister, SUserLogin, SUserOut, SToken
+from app.schemas.users import SUserRegister, SUserLogin, SUserOut, SToken
 from app.auth.service import hash_password, verify_password, create_access_token
 
 from app.repository import Repository

@@ -6,9 +6,3 @@ exclude = [
     "migrations"
 ]
 
-
-[tool.ruff.lint]
-per-file-ignores = { 
-    "tests/*.py" = ["ALL"],
-    "**/alembic/**/*.py" = ["ALL"]  # 👈 Игнорируем все файлы в любых папках alembic
-}

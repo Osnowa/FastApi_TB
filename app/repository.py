@@ -99,7 +99,10 @@ class Repository:
     
     async def add_user(self, data_user):
         '''Добавление пользователя в базу данных'''
-        user = User(**data_user.model_dump())
+        user = User(
+            email=data_user.email,
+            hashed_password=data_user.password  # 👈 Здесь уже хеш
+        )
         self.session.add(user) # запомни этот обьект
         await self.session.commit() # отправлено в бд
         await self.session.refresh(user) # обновление
