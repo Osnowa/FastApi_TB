@@ -24,6 +24,7 @@ class Repository:
     
     async def get_all_tasks(
             self, 
+            user_id: int,
             status: Status | None = None, 
             priority: Priority | None = None, 
             order_by: SortOrderId | None = None,
@@ -34,7 +35,7 @@ class Repository:
         '''Получение всех задач из базы данных'''
 
 
-        stmt = select(Task)
+        stmt = select(Task).where(Task.user_id == user_id)
 
         if title is not None:
             stmt = stmt.where(Task.title.contains(title))
@@ -56,34 +57,34 @@ class Repository:
         result = await self.session.execute(stmt)
         return result.scalars().all()
     
-    async def get_task_by_id(self, task_id: int):
+    async def get_task_by_id(self, task_id: int, user_id: int):
         '''Получение задачи по id'''
-        result = await self.session.execute(select(Task).where(Task.id == task_id))
+        result = await self.session.execute(select(Task).where(Task.id == task_id and Task.user_id == user_id))
         return result.scalars().one_or_none()
     
-    async def update_task(self, task_id: int, data: TaskUpdate):
+    async def update_task(self, task_id: int, data: TaskUpdate, user_id: int):
         '''Обновление задачи в базе данных (полная замена)'''
-        task = await self.get_task_by_id(task_id)
+        task = await self.get_task_by_id(task_id, user_id)
         if not task:
             return None
-        stmt = update(Task).where(Task.id == task_id).values(**data.model_dump())
+        stmt = update(Task).where(Task.id == task_id and Task.user_id == user_id).values(**data.model_dump(), user_id=user_id)
         await self.session.execute(stmt)
         await self.session.commit()
-        return await self.get_task_by_id(task_id)
+        return await self.get_task_by_id(task_id, user_id)
     
-    async def patch_task(self, task_id: int, data: TaskPatch):
+    async def patch_task(self, task_id: int, data: TaskPatch, user_id: int):
         '''Частичное обновление задачи в базе данных'''
-        task = await self.get_task_by_id(task_id)
+        task = await self.get_task_by_id(task_id, user_id)
         if not task:
             return None
-        stmt = update(Task).where(Task.id == task_id).values(**data.model_dump(exclude_unset=True))
+        stmt = update(Task).where(Task.id == task_id and Task.user_id == user_id).values(**data.model_dump(exclude_unset=True))
         await self.session.execute(stmt)
         await self.session.commit()
-        return await self.get_task_by_id(task_id)
+        return await self.get_task_by_id(task_id, user_id)
     
-    async def delete_task(self, task_id: int):
+    async def delete_task(self, task_id: int, user_id: int):
         '''Удаление задачи из базы данных'''
-        task = await self.get_task_by_id(task_id)
+        task = await self.get_task_by_id(task_id, user_id)
         if not task:
             return None
         else:

@@ -1,8 +1,6 @@
-from helpers_db import create_tasks
-
-async def test_patch_task_priority(client):
+async def test_patch_task_priority(auth_client):
     '''Проверка обновления задачи (что меняется только priority)'''
-    await client.post(
+    await auth_client.post(
         "/tasks/",
         json={
             "title": "test_title",
@@ -11,14 +9,14 @@ async def test_patch_task_priority(client):
         }
     )
 
-    await client.patch(
+    await auth_client.patch(
         "/tasks/1",
         json={
             "priority": "medium"
         }
     )
 
-    result = await client.get(
+    result = await auth_client.get(
         "/tasks/1"
     )
 
@@ -27,25 +25,25 @@ async def test_patch_task_priority(client):
     assert result.json()["description"] == "test_description"
     assert result.json()["title"] == "test_title"
 
-async def test_patch_not_found_task(client):
+async def test_patch_not_found_task(auth_client):
     '''Проверка обновления несуществующей задачи'''
-    await client.patch(
+    await auth_client.patch(
         "/tasks/1",
         json={
             "priority": "medium"
         }
     )
 
-    result = await client.get(
+    result = await auth_client.get(
         "/tasks/1"
     )
 
     assert result.status_code == 404
 
-async def test_patch_task_status(client):
+async def test_patch_task_status(auth_client):
     '''Проверка обновления задачи (что меняется только status)'''
     # 1. Создаем реальную задачу через API
-    response = await client.post(
+    response = await auth_client.post(
         "/tasks/",
         json={
             "title": "test_title",
@@ -56,12 +54,12 @@ async def test_patch_task_status(client):
     task_id = response.json()["id"]
     
     # 2. Проверяем, что задача создалась
-    response = await client.get(f"/tasks/{task_id}")
+    response = await auth_client.get(f"/tasks/{task_id}")
     assert response.status_code == 200
     assert response.json()["status"] == "new"
     
     # 3. Меняем статус через PATCH
-    response = await client.patch(
+    response = await auth_client.patch(
         f"/tasks/{task_id}",
         json={"status": "in_progress"}
     )
@@ -74,12 +72,12 @@ async def test_patch_task_status(client):
     assert data["description"] == "test_description"
     
     # 5. Проверяем через GET
-    response = await client.get(f"/tasks/{task_id}")
+    response = await auth_client.get(f"/tasks/{task_id}")
     assert response.json()["status"] == "in_progress"
     
-async def test_patch_garbage_status(client, create_tasks):
+async def test_patch_garbage_status(auth_client):
     '''Проверка обновелния, с мусорным значением статуса'''
-    response = await client.patch(
+    response = await auth_client.patch(
         "/tasks/1",
         json={
             "status": "invalid"
@@ -87,9 +85,9 @@ async def test_patch_garbage_status(client, create_tasks):
     )
     assert response.status_code == 422
 
-async def test_patch_garbage_priority(client, create_tasks):
+async def test_patch_garbage_priority(auth_client):
     '''Проверка обновелния, с мусорным значением приоритета'''
-    response = await client.patch(
+    response = await auth_client.patch(
         "/tasks/1",
         json={
             "priority": "invalid"

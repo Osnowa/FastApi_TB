@@ -22,6 +22,7 @@ async def add_task(task: TaskCreate, session: SessionDep, user_current: CurrentU
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_tasks(
     session: SessionDep, 
+    user_current: CurrentUserDep,
     status: Status | None = None, 
     priority: Priority | None = None, 
     order_by: SortOrderId | None = None,
@@ -33,13 +34,13 @@ async def get_tasks(
     поиск по названию) & сортировка по id, пагинация'''
     
     repo = Repository(session)
-    return await repo.get_all_tasks(status, priority, order_by, title, limit, offset)
+    return await repo.get_all_tasks(user_current.id, status, priority, order_by, title, limit, offset)
 
 @router.get('/{id}', status_code=status.HTTP_200_OK)
-async def get_task_id(id: int , session: SessionDep) -> TaskResponse:
+async def get_task_id(id: int , session: SessionDep, user_current: CurrentUserDep) -> TaskResponse:
     '''Получить задачу по id'''
     repo = Repository(session)
-    result =  await repo.get_task_by_id(id)
+    result = await repo.get_task_by_id(id, user_current.id)
     if result:
         return result
     else:
@@ -49,12 +50,12 @@ async def get_task_id(id: int , session: SessionDep) -> TaskResponse:
             )
     
 @router.put('/{id}', status_code=status.HTTP_200_OK)
-async def put_task(id: int, task: TaskUpdate, session: SessionDep) -> TaskResponse:
+async def put_task(id: int, task: TaskUpdate, session: SessionDep, user_current: CurrentUserDep) -> TaskResponse:
     '''Изменить задачу (полная замена)'''
     repo = Repository(session)
-    result = await repo.get_task_by_id(id)
+    result = await repo.get_task_by_id(id, user_current.id)
     if result:
-        return await repo.update_task(id, task)
+        return await repo.update_task(id, task, user_current.id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -62,12 +63,12 @@ async def put_task(id: int, task: TaskUpdate, session: SessionDep) -> TaskRespon
             )
     
 @router.patch('/{id}', status_code=status.HTTP_200_OK)
-async def patch_task(id: int, data: TaskPatch, session: SessionDep) -> TaskResponse:
+async def patch_task(id: int, data: TaskPatch, session: SessionDep, user_current: CurrentUserDep) -> TaskResponse:
     '''Изменить задачу (частичное изменение)'''
     repo = Repository(session)
-    result = await repo.get_task_by_id(id)
+    result = await repo.get_task_by_id(id, user_current.id)
     if result:
-        return await repo.patch_task(id, data)
+        return await repo.patch_task(id, data, user_current.id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -75,12 +76,12 @@ async def patch_task(id: int, data: TaskPatch, session: SessionDep) -> TaskRespo
             )
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(id: int, session: SessionDep):
+async def delete_task(id: int, session: SessionDep, user_current: CurrentUserDep):
     '''Удалить задачу'''
     repo = Repository(session)
-    result = await repo.get_task_by_id(id)
+    result = await repo.get_task_by_id(id, user_current.id)
     if result:
-        await repo.delete_task(id)
+        await repo.delete_task(id, user_current.id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

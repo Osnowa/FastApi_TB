@@ -1,37 +1,38 @@
-async def test_put_task(client, db):
+async def test_put_task(auth_client):
     '''Проверка частичного обновления задачи'''
     # добавим задачу
-    await client.post(
+    await auth_client.post(
         "/tasks/",
         json={
             "title": "test_title",
             "description": "test_description"
         }
     )
-    task = await client.get("/tasks/1")
+    task = await auth_client.get("/tasks/1")
     assert task.status_code == 200
     assert task.json()["title"] == "test_title"
     assert task.json()["description"] == "test_description"
 
     # изменяем задачу
-    await client.put(
+    await auth_client.put(
         "/tasks/1",
         json={
             "title": "test_title_changed",
             "description": "test_description_changed"
         }
     )
-    task1 = await client.get("/tasks/1")
+    task1 = await auth_client.get("/tasks/1")
     assert task1.status_code == 200
     assert task1.json()["title"] == "test_title_changed"
     assert task1.json()["description"] == "test_description_changed"
 
 
-async def test_delete_task(client):
-    response = await client.delete("/tasks/1")
+async def test_delete_task(auth_client):
+    '''Проверка удаления задачи'''
+    response = await auth_client.delete("/tasks/1")
     assert response.status_code == 404
 
-    await client.post(
+    await auth_client.post(
         "/tasks/",
         json={
             "title": "test_title",
@@ -39,5 +40,5 @@ async def test_delete_task(client):
         }
     )
     
-    response = await client.delete("/tasks/1")
+    response = await auth_client.delete("/tasks/1")
     assert response.status_code == 204

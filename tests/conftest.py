@@ -1,8 +1,10 @@
 import pytest_asyncio
 from app.database import Base, get_session
+from app.auth.dependencies import get_current_user
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from httpx import AsyncClient, ASGITransport
 from app.main import app
+from app.models.users import User
 
 
 
@@ -55,3 +57,43 @@ async def client(db):
         yield ac
 
     app.dependency_overrides = {}
+
+
+@pytest_asyncio.fixture
+async def auth_client(db):
+    '''Подменяем авторизированного пользователя'''
+    fake_user = User(
+        email="test@pochta.ru",
+        hashed_password="fake_hashed_password"
+    )
+    db.add(fake_user)
+    await db.commit()
+    await db.refresh(fake_user)  # получаем настоящий id из БД
+
+    async def override_get_session():
+        yield db
+
+    async def override_get_current_user():
+        return fake_user  # теперь fake_user.id реально существует в БД
+
+    app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_current_user] = override_get_current_user
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test"
+    ) as ac:
+        yield ac
+
+    app.dependency_overrides = {}
+
+@pytest_asyncio.fixture(scope='function')
+async def create_tasks(auth_client):
+    for i in range(1,4):
+        await auth_client.post(
+            "/tasks/",
+            json={
+                "title": f"test_title{i}",
+                "description": f"test_description{i}"
+            }
+        )

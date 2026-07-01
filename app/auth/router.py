@@ -28,7 +28,7 @@ async def login(user_data: SUserLogin, session: SessionDep) -> SToken:
     '''ручка для логина пользователя (по email, пароль), отдаем токен'''
     repo = Repository(session)
     user = await repo.get_user(user_data.email) 
-    if not user or not verify_password(user_data.password, user.password):
+    if not user or not verify_password(user_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Невалидные учетные данные"
