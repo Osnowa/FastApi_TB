@@ -1,5 +1,5 @@
 # Модель данных для базы данных в SQLite и SQLAlchemy
-from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import Enum as SQLEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -17,3 +17,5 @@ class Task(Base):
     status: Mapped[Status | None] = mapped_column(SQLEnum(Status), default=Status.new) # статус задачи
     priority: Mapped[Priority | None] = mapped_column(SQLEnum(Priority), default=None) # приоритет
     created_at: Mapped[datetime] = mapped_column(server_default=func.now()) # дата создания
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

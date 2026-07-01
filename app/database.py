@@ -17,6 +17,7 @@ engine = create_async_engine(
 SessionFactory = async_sessionmaker(engine, expire_on_commit=False)
 
 class Base(DeclarativeBase):
+    '''Общий базовый класс для всех моделей'''
     pass
 
 async def dispose_engine():

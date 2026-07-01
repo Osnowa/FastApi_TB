@@ -5,6 +5,7 @@ from environs import Env
 class Config:
     DATABASE_URL: str 
     ALEMBIC_DATABASE_URL: str
+    SECRET_KEY: str
 
     @classmethod
     def from_env(cls):
@@ -12,5 +13,6 @@ class Config:
         env.read_env()
         return cls(
             DATABASE_URL = env.str("DATABASE_URL"),
-            ALEMBIC_DATABASE_URL = env.str("ALEMBIC_DATABASE_URL")
+            ALEMBIC_DATABASE_URL = env.str("ALEMBIC_DATABASE_URL"),
+            SECRET_KEY = env.str("SECRET_KEY")
         )

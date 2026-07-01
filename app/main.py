@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from app.routers.tasks import router as task_router
+from app.auth.router import router as auth_router
 
 from contextlib import asynccontextmanager
 from app.database import dispose_engine
@@ -18,6 +19,7 @@ app = FastAPI(lifespan=lifespan)
 
 # подключаем роутеры
 app.include_router(task_router)
+app.include_router(auth_router)
 
 
 

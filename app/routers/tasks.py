@@ -1,10 +1,12 @@
 from fastapi import APIRouter, status, HTTPException
 
 from app.schemas.tasks import TaskCreate, TaskUpdate, TaskPatch, TaskResponse
-from ..database import SessionDep
+from app.database import SessionDep
+from app.auth.dependencies import CurrentUserDep
 from app.models.enum import Status, Priority, SortOrderId
 
 from app.repository import Repository
+
 
 router = APIRouter(
     prefix="/tasks", # роутер сам прикрепит префикс к эндпоинтам
@@ -12,10 +14,10 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def add_task(task: TaskCreate, session: SessionDep) -> TaskResponse:
+async def add_task(task: TaskCreate, session: SessionDep, user_current: CurrentUserDep) -> TaskResponse:
     '''Добавить задачу'''
     repo = Repository(session)
-    return await repo.add_task(task)
+    return await repo.add_task(task, user_current.id)
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_tasks(
