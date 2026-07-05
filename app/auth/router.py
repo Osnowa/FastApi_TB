@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.database import SessionDep
 from app.schemas.users import SUserRegister, SUserLogin, SUserOut, SToken
 from app.auth.service import hash_password, verify_password, create_access_token
+from app.auth.dependencies import CurrentUserDep
 
 from app.repository import Repository
 
@@ -38,3 +39,6 @@ async def login(user_data: SUserLogin, session: SessionDep) -> SToken:
     access_token = create_access_token({"sub": str(user.id)})
     return SToken(access_token=access_token)
     
+@router.get("/me", status_code=status.HTTP_200_OK)
+async def me(current_user : CurrentUserDep):
+    return current_user # FastAPI вызвал get_current_user() и вернул сюда юзера

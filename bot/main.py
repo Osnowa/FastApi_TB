@@ -59,9 +59,18 @@ async def main():
     logger.info("Подклбчение middleware")
 
     router_add_tasks.message.middleware(Token_Middleware())
+    router_add_tasks.callback_query.middleware(Token_Middleware())
+
     router_delete_tasks.message.middleware(Token_Middleware())
+    router_delete_tasks.callback_query.middleware(Token_Middleware())
+
     router_done_tasks.message.middleware(Token_Middleware())
+    router_done_tasks.callback_query.middleware(Token_Middleware())
+
+
     router_show_tasks.message.middleware(Token_Middleware())
+    router_show_tasks.callback_query.middleware(Token_Middleware())
+
     router_correct_task.message.middleware(Token_Middleware())
 
     logger.info("Запуск бота")

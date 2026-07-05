@@ -1,6 +1,5 @@
-from aiogram import Router
-from aiogram.types import Message
-from aiogram.filters import Command
+from aiogram import F, Router
+from aiogram.types import CallbackQuery
 import httpx
 import logging
 
@@ -9,18 +8,18 @@ from bot.services.api_client import api_client  # 👈 Импортируем г
 router = Router()
 logger = logging.getLogger(__name__)
 
-@router.message(Command('tasks'))
-async def get_tasks(message: Message, token: str):
+@router.callback_query(F.data == "get_tasks")
+async def get_tasks(callback: CallbackQuery, token: str):
     '''Получить все задачи'''
     try:
         response = await api_client.get_tasks(token) # Получаем списко задач
     except httpx.HTTPError as e:
-        await message.answer(f"Произошла ошибка: {e}")
+        await callback.message.answer(f"Произошла ошибка: {e}")
         logger.error(f"Произошла ошибка: {e}")
         return
     
     if response is None:
-        await message.answer("Задач нет")
+        await callback.message.edit_text("Задач нет", reply_markup=callback.message.reply_markup)
     
     text = "Список задач:\n\n"
     for task in response:
@@ -32,4 +31,4 @@ async def get_tasks(message: Message, token: str):
             f"Приоритет: {task['priority'] or '-'}\n"
             f"Время добавления задачи: {task['created_at']}\n\n"
         )
-    await message.answer(text)
+    await callback.message.edit_text(text, reply_markup=callback.message.reply_markup)

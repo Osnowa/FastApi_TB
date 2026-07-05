@@ -13,6 +13,17 @@ class TaskAPIClient:
             timeout=10 # бросит исключение в случае превышения таймаута
         )
 
+    async def get_user(self, token: str):
+        '''Получение пользователя'''
+        response = await self._client.get(
+            "/auth/me",
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
+        )
+        response.raise_for_status()
+        return response.json()
+
 
     async def register(self, email: str, password: str):
         '''Регистрация'''

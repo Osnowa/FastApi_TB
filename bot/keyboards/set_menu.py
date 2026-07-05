@@ -17,20 +17,12 @@ async def set_main_menu(bot: Bot):
             description='Авторизация'
         ),
         BotCommand(
-            command='/tasks',
-            description='Список задач',
-        ),
-        BotCommand(
-            command='/add',
-            description='Добавить задачу'
-        ),
-        BotCommand(
-            command='/correct_task',
-            description='Править задачу'
-        ),
-        BotCommand(
             command='/cancel',
             description='Отменить действие'
+        ),
+        BotCommand(
+            command='/me',
+            description='Информация о пользователе'
         ) 
 
     ]

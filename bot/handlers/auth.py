@@ -6,6 +6,7 @@ from bot.services.api_client import api_client  # 👈 Импортируем г
 from app.auth.service import ACCESS_TOKEN_EXPIRE_MINUTES
 import httpx
 
+from bot.keyboards.common import inline_kb_common
 from bot.states.redis import r
 import logging
 
@@ -106,6 +107,30 @@ async def login_password(message: Message, state: FSMContext):
     await r.hset(f"token:{message.from_user.id}", mapping={"token": response['access_token']})
     await r.expire(f"token:{message.from_user.id}", ACCESS_TOKEN_EXPIRE_MINUTES * 60) # Выдаем время жизни токена
 
-    await message.answer(f"Вы успешно авторизировались !"
-                         "Доступ к командам бота открыт !")
+    await message.answer(f"Вы успешно авторизировались !\n"
+                         "Доступ к командам бота открыт !",
+                         reply_markup = inline_kb_common)
     
+
+@router.message(Command('me'))
+async def me(message: Message):
+    '''Получить информацию о пользователе'''
+    time_token = await r.ttl(f"token:{message.from_user.id}")
+    if time_token > 0:
+        token = await r.hget(f"token:{message.from_user.id}", "token")
+        try:
+            user = await api_client.get_user(token)
+        except httpx.HTTPError as e:
+            await message.answer(f"Произошла ошибка")
+            return
+
+        await message.answer("Вы авторизованы ! Доступ к командам бота открыт ! \n"
+                             f"Ваша почта: {user['email']} \n"
+                             f"Время жизни сессии: {time_token} секунд")
+    if time_token == -1:
+        await message.answer("Вы зарегистрированы, но время сессии истекло ! \n"
+                             f"Для продолжения работы с ботом, введите команду /login")
+    if time_token == -2:
+        await message.answer("Вы не авторизированы ! \n"
+                             f"Для продолжения работы с ботом, введите команду /register - для регистрации\n /login - для входа")
+

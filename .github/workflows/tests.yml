@@ -27,5 +27,6 @@ jobs:
       env:
           DATABASE_URL: "sqlite+aiosqlite:///./test.db"
           ALEMBIC_DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          SECRET_KEY: "secret_key_for_test_env_only_do_not_use_in_prod"
       run: |
         pytest --cov=app

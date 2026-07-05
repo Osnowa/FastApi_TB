@@ -1,6 +1,6 @@
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import StateFilter
 
 from bot.states.done_delete_task import FSMDeleteTask
 from aiogram.fsm.context import FSMContext
@@ -19,7 +19,7 @@ router = Router()
 @router.callback_query(F.data == "delete_task", StateFilter(default_state))
 async def delete_task_get_id(callback: CallbackQuery, state: FSMContext):
     '''Удалить задачу (получаем id задачи )'''
-    await callback.message.edit_reply_markup("Введите id задачи для её удаления", reply_markup=None)
+    await callback.message.edit_text("Введите id задачи для её удаления", reply_markup=None)
     await state.set_state(FSMDeleteTask.is_delete)
 
 @router.message(StateFilter(FSMDeleteTask.is_delete))

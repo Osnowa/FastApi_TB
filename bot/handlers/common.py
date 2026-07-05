@@ -4,6 +4,8 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 
+from bot.keyboards.common import inline_kb_common
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,9 +18,8 @@ async def start(message: Message):
                          'Команды:\n'
                          '/register — регистрация\n'
                          '/login — авторизация\n'
-                         '/tasks — список задач\n'
-                         '/add — добавить задачу\n'
-                         '/correct_task — править задачу\n'
+                         '/me - информация о пользователе\n',
+                         reply_markup = inline_kb_common
                          )
     
 @router.message(Command('cancel'), ~StateFilter(default_state))
