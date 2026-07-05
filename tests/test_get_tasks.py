@@ -1,7 +1,3 @@
-from app.repository import Repository
-from app.schemas.tasks import TaskCreate
-
-
 async def test_get_tasks(auth_client):
     '''Проверка получения задач (базовый случай)'''
     # добавим задачу

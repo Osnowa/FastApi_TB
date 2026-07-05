@@ -14,10 +14,11 @@ router = Router()
 async def start(message: Message):
     await message.answer('Привет! Я бот для управления задачами.\n'
                          'Команды:\n'
+                         '/register — регистрация\n'
+                         '/login — авторизация\n'
                          '/tasks — список задач\n'
                          '/add — добавить задачу\n'
-                         '/done — отметить задачу выполненной\n'
-                         '/delete — удалить задачу\n'
+                         '/correct_task — править задачу\n'
                          )
     
 @router.message(Command('cancel'), ~StateFilter(default_state))

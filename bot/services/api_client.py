@@ -13,7 +13,32 @@ class TaskAPIClient:
             timeout=10 # бросит исключение в случае превышения таймаута
         )
 
-    async def get_tasks(self, status: Status = None, priority: Priority = None, order_by: SortOrderId = None):
+
+    async def register(self, email: str, password: str):
+        '''Регистрация'''
+        response = await self._client.post(
+            "/auth/register",
+            json={
+                "email": email,
+                "password": password
+            }
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    async def login(self, email: str, password: str):
+        '''Авторизация'''
+        response = await self._client.post(
+            "/auth/login",
+            json={
+                "email": email,
+                "password": password
+            }
+        )
+        response.raise_for_status()
+        return response.json()
+
+    async def get_tasks(self, token: str, status: Status = None, priority: Priority = None, order_by: SortOrderId = None):
         '''Получить все задачи'''
         params = {}
         if status is not None:
@@ -26,12 +51,15 @@ class TaskAPIClient:
         # httpx сам соберет правильный URL
         response = await self._client.get(
             "/tasks/",
-            params=params  # 👈 Передаем словарь параметров
+            params=params,  
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
         )
         response.raise_for_status()
         return response.json()  
         
-    async def create_task(self, title: str, description: str, priority: Priority = None):
+    async def create_task(self, title: str, description: str, priority: Priority = None, token: str = None):
         '''Создать задачу'''
         params = {
             "title": title,
@@ -42,7 +70,10 @@ class TaskAPIClient:
 
         response = await self._client.post(
             "/tasks/",
-            json=params
+            json=params,
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
         )
         response.raise_for_status()
         return response.json()
@@ -56,19 +87,25 @@ class TaskAPIClient:
         response.raise_for_status()
         return response.json()
         
-    async def patch_task(self, task_id: int, data: dict):
+    async def patch_task(self, task_id: int, data: dict, token: str):
         '''Обновить задачу (частично)'''
         response = await self._client.patch(
             f"/tasks/{task_id}",
-            json=data
+            json=data,
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
         )
         response.raise_for_status()
         return response.json()
         
-    async def delete_task(self, task_id: int):
+    async def delete_task(self, task_id: int, token: str):
         '''Удалить задачу'''
         response = await self._client.delete(
-            f"/tasks/{task_id}"
+            f"/tasks/{task_id}",
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
         )
 
         if response.status_code == 404:

@@ -11,8 +11,12 @@ from bot.handlers.delete_tasks import router as router_delete_tasks
 from bot.handlers.done_task import router as router_done_tasks
 from bot.handlers.show_tasks import router as router_show_tasks
 from bot.handlers.common import router as router_common
+from bot.handlers.auth import router as router_auth
+from bot.handlers.correct_task import router as router_correct_task
 
+from bot.middleware.auth_middleware import Token_Middleware
 
+from bot.keyboards.set_menu import set_main_menu
 
 from aiogram.fsm.storage.redis import RedisStorage
 from bot.states.redis import r
@@ -39,12 +43,28 @@ async def main():
 
     dp = Dispatcher(storage=storage)
 
+    # Настраиваем меню (кнопки)
+    await set_main_menu(bot)
+
     logger.info("Подключение роутеров")
+
     dp.include_router(router_common)
     dp.include_router(router_add_tasks)
     dp.include_router(router_delete_tasks)
     dp.include_router(router_done_tasks)
     dp.include_router(router_show_tasks)
+    dp.include_router(router_auth)
+    dp.include_router(router_correct_task)
+
+    logger.info("Подклбчение middleware")
+
+    router_add_tasks.message.middleware(Token_Middleware())
+    router_delete_tasks.message.middleware(Token_Middleware())
+    router_done_tasks.message.middleware(Token_Middleware())
+    router_show_tasks.message.middleware(Token_Middleware())
+    router_correct_task.message.middleware(Token_Middleware())
+
+    logger.info("Запуск бота")
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)

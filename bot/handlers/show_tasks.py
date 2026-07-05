@@ -10,10 +10,10 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 @router.message(Command('tasks'))
-async def get_tasks(message: Message):
+async def get_tasks(message: Message, token: str):
     '''Получить все задачи'''
     try:
-        response = await api_client.get_tasks() # Получаем списко задач
+        response = await api_client.get_tasks(token) # Получаем списко задач
     except httpx.HTTPError as e:
         await message.answer(f"Произошла ошибка: {e}")
         logger.error(f"Произошла ошибка: {e}")

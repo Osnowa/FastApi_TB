@@ -35,7 +35,7 @@ async def add_task_priority(message: Message, state: FSMContext):
     await state.set_state(FSMAddTaskform.priority)
 
 @router.message(StateFilter(FSMAddTaskform.priority))
-async def add_task_finish(message: Message, state: FSMContext):
+async def add_task_finish(message: Message, state: FSMContext, token: str):
     '''Добавить задачу'''
     request_user = message.text
     if message.text == 'нет':
@@ -44,7 +44,7 @@ async def add_task_finish(message: Message, state: FSMContext):
         await state.update_data(priority = request_user)
         data = await state.get_data()
         try:
-            response = await api_client.create_task(data['title'], data['description'], data['priority'])
+            response = await api_client.create_task(data['title'], data['description'], data['priority'], token)
         except httpx.HTTPError as e:
             await message.answer(f"Произошла ошибка: {e}")
             logger.error(f"Произошла ошибка: {e}")
