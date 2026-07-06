@@ -5,6 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from app.models.users import User
 from app.models.tasks import Base
 
 from app.config import Config

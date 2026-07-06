@@ -23,7 +23,7 @@ async def get_home(callback: CallbackQuery, state: FSMContext):
     )
 
 @router.callback_query(F.data == "get_home", StateFilter(default_state))
-async def get_home(callback: CallbackQuery, state: FSMContext):
+async def return_home(callback: CallbackQuery, state: FSMContext):
     '''Возврат домой (главное меню)'''
     await callback.answer()
     await state.clear()
