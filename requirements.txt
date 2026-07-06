@@ -61,4 +61,6 @@ Tree==0.2.4
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.49.0
+watchdog==6.0.0
+watchfiles==1.2.0
 yarl==1.24.2

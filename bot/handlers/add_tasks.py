@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from bot.services.api_client import api_client  # 👈 Импортируем глобальный
 from bot.keyboards.add_task import kb_priority
+from bot.keyboards.common import inline_kb_common
 
 import logging
 import httpx
@@ -18,6 +19,7 @@ router = Router()
 @router.callback_query(F.data == "add_task" , StateFilter(default_state))
 async def add_task(callback: CallbackQuery, state: FSMContext):
     '''Добавить задачу (начало)'''
+    logger.info("Вошли в хендлер для добавления задачи")
     await callback.message.edit_text('Введите название задачи')
     await state.set_state(FSMAddTaskform.title)
 
@@ -35,7 +37,7 @@ async def add_task_priority(message: Message, state: FSMContext):
     await message.answer('Выберите приоритет задачи', reply_markup = kb_priority)
     await state.set_state(FSMAddTaskform.priority)
 
-@router.callback_query(F.data.in_(['low', 'medium', 'high', 'none']) , StateFilter(FSMAddTaskform.priority))
+@router.callback_query(F.data.in_(['low', 'medium', 'high', 'noy']) , StateFilter(FSMAddTaskform.priority))
 async def add_task_finish(callback: CallbackQuery, state: FSMContext, token: str):
     '''Добавить задачу'''
     request_user = callback.data
@@ -49,5 +51,5 @@ async def add_task_finish(callback: CallbackQuery, state: FSMContext, token: str
         logger.error(f"Произошла ошибка: {e}")
         return
 
-    await callback.message.answer(f"Задача <b>{response['title']}</b> добавлена")
     await state.clear()
+    await callback.message.edit_text(f"Задача <b>{response['title']}</b> добавлена", reply_markup = inline_kb_common)

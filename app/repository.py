@@ -1,5 +1,5 @@
 # Файл для работы с базой данных
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.tasks import TaskCreate, TaskPatch, TaskUpdate
@@ -90,6 +90,12 @@ class Repository:
         else:
             await self.session.delete(task)
             await self.session.commit()
+
+    async def delete_all_tasks(self, user_id: int):
+        '''Удаление всех задач из базы данных по user_id'''
+        stmt = delete(Task).where(Task.user_id == user_id)
+        await self.session.execute(stmt)
+        await self.session.commit()
 
     # --- Логика для User ---
 

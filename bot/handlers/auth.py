@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from bot.services.api_client import api_client  # 👈 Импортируем глобальный
 from app.auth.service import ACCESS_TOKEN_EXPIRE_MINUTES
+from aiogram.types import ReactionTypeEmoji
 import httpx
 
 from bot.keyboards.common import inline_kb_common
@@ -65,13 +66,18 @@ async def register_password(message: Message, state: FSMContext):
     await r.expire(f"token:{message.from_user.id}", ACCESS_TOKEN_EXPIRE_MINUTES * 60) # Выдаем время жизни токена
 
 
+### ======== Команда login =========
+
+
 @router.message(Command('login'))
 async def login(message: Message, state: FSMContext):
     '''Вход в систему'''
     token = await r.ttl(f"token:{message.from_user.id}")
     if token > 0:
-        await message.answer("Вы уже авторизованы ! Доступ к командам бота открыт !")
+        await message.delete()
+        await message.answer("Вы уже авторизованы ! Доступ к командам бота открыт !", reply_markup = inline_kb_common)
         return
+    await message.delete()
     await message.answer('Добрый день ! Для входа, пожалуйста, введите Вашу почту ...')
     await state.set_state(FSMAddLogin.email)
 
@@ -79,6 +85,7 @@ async def login(message: Message, state: FSMContext):
 async def login_email(message: Message, state: FSMContext):
     '''Вход в систему (ввод пароля)'''
     # Сохраняем почту
+    await message.react(ReactionTypeEmoji(emoji="👍"))
     await state.update_data(email=message.text)
     await message.answer('Введите пароль ...')
     await state.set_state(FSMAddLogin.password)
@@ -87,6 +94,7 @@ async def login_email(message: Message, state: FSMContext):
 async def login_password(message: Message, state: FSMContext):
     '''Вход в систему (окончание)'''
     # Сохраняем пароль
+    await message.react(ReactionTypeEmoji(emoji="👍"))
     await state.update_data(password=message.text)
     # Получаем почту и пароль пользователя
     data = await state.get_data()
@@ -107,7 +115,7 @@ async def login_password(message: Message, state: FSMContext):
     await r.hset(f"token:{message.from_user.id}", mapping={"token": response['access_token']})
     await r.expire(f"token:{message.from_user.id}", ACCESS_TOKEN_EXPIRE_MINUTES * 60) # Выдаем время жизни токена
 
-    await message.answer(f"Вы успешно авторизировались !\n"
+    await message.answer("Вы успешно авторизировались !\n"
                          "Доступ к командам бота открыт !",
                          reply_markup = inline_kb_common)
     
@@ -120,8 +128,8 @@ async def me(message: Message):
         token = await r.hget(f"token:{message.from_user.id}", "token")
         try:
             user = await api_client.get_user(token)
-        except httpx.HTTPError as e:
-            await message.answer(f"Произошла ошибка")
+        except httpx.HTTPError:
+            await message.answer("Произошла ошибка")
             return
 
         await message.answer("Вы авторизованы ! Доступ к командам бота открыт ! \n"
@@ -129,8 +137,8 @@ async def me(message: Message):
                              f"Время жизни сессии: {time_token} секунд")
     if time_token == -1:
         await message.answer("Вы зарегистрированы, но время сессии истекло ! \n"
-                             f"Для продолжения работы с ботом, введите команду /login")
+                             "Для продолжения работы с ботом, введите команду /login")
     if time_token == -2:
         await message.answer("Вы не авторизированы ! \n"
-                             f"Для продолжения работы с ботом, введите команду /register - для регистрации\n /login - для входа")
+                             "Для продолжения работы с ботом, введите команду /register - для регистрации\n /login - для входа")
 

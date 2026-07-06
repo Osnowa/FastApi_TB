@@ -76,7 +76,7 @@ class TaskAPIClient:
             "title": title,
             "description": description
         }
-        if priority is not None:
+        if priority is not None and priority != 'noy':
             params["priority"] = priority
 
         response = await self._client.post(
@@ -121,6 +121,17 @@ class TaskAPIClient:
 
         if response.status_code == 404:
             return None
+        response.raise_for_status()
+        return response
+    
+    async def delete_all_tasks(self, token: str):
+        '''Удалить все задачи'''
+        response = await self._client.delete(
+            "/tasks/",
+            headers={
+                "Authorization": f"Bearer {token}"
+            }
+        )
         response.raise_for_status()
         return response
     

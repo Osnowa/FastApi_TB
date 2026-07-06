@@ -87,3 +87,9 @@ async def delete_task(id: int, session: SessionDep, user_current: CurrentUserDep
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Задача не найдена"
             )
+    
+@router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_tasks(session: SessionDep, user_current: CurrentUserDep):
+    '''Удалить все задачи'''
+    repo = Repository(session)
+    await repo.delete_all_tasks(user_current.id)

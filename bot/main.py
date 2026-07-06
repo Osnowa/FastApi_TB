@@ -13,6 +13,7 @@ from bot.handlers.show_tasks import router as router_show_tasks
 from bot.handlers.common import router as router_common
 from bot.handlers.auth import router as router_auth
 from bot.handlers.correct_task import router as router_correct_task
+from bot.handlers.get_home import router as router_get_home
 
 from bot.middleware.auth_middleware import Token_Middleware
 
@@ -55,6 +56,7 @@ async def main():
     dp.include_router(router_show_tasks)
     dp.include_router(router_auth)
     dp.include_router(router_correct_task)
+    dp.include_router(router_get_home)
 
     logger.info("Подклбчение middleware")
 
@@ -67,11 +69,15 @@ async def main():
     router_done_tasks.message.middleware(Token_Middleware())
     router_done_tasks.callback_query.middleware(Token_Middleware())
 
+    router_get_home.message.middleware(Token_Middleware())
+    router_get_home.callback_query.middleware(Token_Middleware())
 
     router_show_tasks.message.middleware(Token_Middleware())
     router_show_tasks.callback_query.middleware(Token_Middleware())
 
     router_correct_task.message.middleware(Token_Middleware())
+
+
 
     logger.info("Запуск бота")
 

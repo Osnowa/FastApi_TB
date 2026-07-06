@@ -6,7 +6,7 @@ from bot.states.done_delete_task import FSMDeleteTask
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from bot.services.api_client import api_client  # 👈 Импортируем глобальный
-
+from bot.keyboards.common import inline_kb_common
 
 import logging
 import httpx
@@ -31,5 +31,18 @@ async def delete_task(message: Message, state: FSMContext, token: str):
         await message.answer(f"Произошла ошибка: {e}")
         logger.error(f"Произошла ошибка: {e}")
         return
-    await message.answer("Задача удалена")
+    
     await state.clear()
+    await message.edit_text("Задача удалена", reply_markup=inline_kb_common)
+
+
+@router.callback_query(F.data == "delete_all_tasks")
+async def delete_all_tasks(callback: CallbackQuery, token: str):
+    '''Удалить все задачи пользователя'''
+    try:
+        await api_client.delete_all_tasks(token)
+    except httpx.HTTPError as e:
+        await callback.message.answer(f"Произошла ошибка: {e}")
+        logger.error(f"Произошла ошибка: {e}")
+        return
+    await callback.message.edit_text("Все задачи удалены", reply_markup=inline_kb_common)

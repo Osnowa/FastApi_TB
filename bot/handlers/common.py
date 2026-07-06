@@ -1,5 +1,5 @@
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import F, Router
+from aiogram.types import CallbackQuery, Message
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -28,3 +28,6 @@ async def cancel(message: Message, state: FSMContext):
     logger.info("Вошли в хендлер для отмены действия")
     await message.answer('Действие отменено')
     await state.clear()
+
+
+    

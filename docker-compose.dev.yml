@@ -16,9 +16,14 @@ services:
       - redis
 
     volumes:
+      - .:/app
       - sqlite_data:/app/data
 
-    restart: unless-stopped
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
 
   bot:
     build:
@@ -34,7 +39,16 @@ services:
       - api
       - redis
 
-    restart: unless-stopped
+    volumes:
+      - .:/app
+
+    command: >
+      watchfiles
+      --ignore-paths data/tasks.db
+      --ignore-paths tasks.db
+      --ignore-paths __pycache__
+      --ignore-paths .git
+      "python -m bot.main"
 
   redis:
     image: redis:7-alpine
@@ -46,8 +60,6 @@ services:
 
     volumes:
       - redis_data:/data
-
-    restart: unless-stopped
 
 volumes:
   redis_data:

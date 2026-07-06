@@ -31,5 +31,5 @@ async def done_task(message: Message, state: FSMContext, token: str):
         await message.answer(f"Произошла ошибка: {e}")
         logger.error(f"Произошла ошибка: {e}")
         return
-    await message.answer("Задача помечана как выполнененная")
     await state.clear()
+    await message.edit_text("Задача помечана как выполнененная")

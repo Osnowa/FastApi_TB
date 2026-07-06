@@ -7,7 +7,7 @@ config = Config.from_env()
 
 SECRET_KEY = config.SECRET_KEY  # в реальности из .env
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 300
 
 
 # --- Пароли ---
