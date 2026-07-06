@@ -6,6 +6,11 @@
 
 ### ИИ использовался исключительно для проверки ошибок и для упрощения рутинных моментов 
 
+<img width="357" height="617" alt="Снимок экрана — 2026-07-06 в 23 00 48" src="https://github.com/user-attachments/assets/bf349ab1-de5f-4e1c-99f0-f443a6d129c7" />
+<img width="357" height="669" alt="Снимок экрана — 2026-07-06 в 23 00 39" src="https://github.com/user-attachments/assets/9d49b659-891f-43e0-9a20-edad1e0c83a5" />
+<img width="1316" height="772" alt="Снимок экрана — 2026-07-06 в 22 59 37" src="https://github.com/user-attachments/assets/38c85369-23ff-4505-9f60-c3f41b2053ae" />
+
+
 ---
 
 # 🚀 Возможности
